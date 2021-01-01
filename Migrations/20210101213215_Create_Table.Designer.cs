@@ -10,8 +10,8 @@ using WebProje.Context;
 namespace WebProje.Migrations
 {
     [DbContext(typeof(BarinakDbContext))]
-    [Migration("20210101194524_Create_Database")]
-    partial class Create_Database
+    [Migration("20210101213215_Create_Table")]
+    partial class Create_Table
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,7 +37,13 @@ namespace WebProje.Migrations
                     b.Property<DateTime>("asi_tarihi")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("kayitli_hayvan_id")
+                        .HasColumnType("int");
+
                     b.HasKey("id");
+
+                    b.HasIndex("kayitli_hayvan_id")
+                        .IsUnique();
 
                     b.ToTable("AsiTakvimi");
                 });
@@ -210,7 +216,9 @@ namespace WebProje.Migrations
             modelBuilder.Entity("WebProje.Entity.KayitliHayvanlar", b =>
                 {
                     b.Property<int>("id")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
 
                     b.Property<string>("adi")
                         .HasColumnType("nvarchar(max)");
@@ -380,6 +388,17 @@ namespace WebProje.Migrations
                     b.ToTable("SahiplenmeTalepleri");
                 });
 
+            modelBuilder.Entity("WebProje.Entity.AsiTakvimi", b =>
+                {
+                    b.HasOne("WebProje.Entity.KayitliHayvanlar", "hayvan")
+                        .WithOne("asi_takvimi")
+                        .HasForeignKey("WebProje.Entity.AsiTakvimi", "kayitli_hayvan_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("hayvan");
+                });
+
             modelBuilder.Entity("WebProje.Entity.CalismaSaatleri", b =>
                 {
                     b.HasOne("WebProje.Entity.BarinakBilgileri", "barinak")
@@ -421,12 +440,6 @@ namespace WebProje.Migrations
                         .WithMany("hayvanlar")
                         .HasForeignKey("cinsiyetiid");
 
-                    b.HasOne("WebProje.Entity.AsiTakvimi", "asi_takvimi")
-                        .WithOne("hayvan")
-                        .HasForeignKey("WebProje.Entity.KayitliHayvanlar", "id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WebProje.Entity.SaglikDurumu", "saglik_durumu")
                         .WithMany("hayvanlar")
                         .HasForeignKey("saglik_durumuid");
@@ -434,8 +447,6 @@ namespace WebProje.Migrations
                     b.HasOne("WebProje.Entity.SahiplenebilirlikDurumu", "sahiplenebilirlik_durumu")
                         .WithMany("hayvanlar")
                         .HasForeignKey("sahiplenebilirlik_durumuid");
-
-                    b.Navigation("asi_takvimi");
 
                     b.Navigation("beslenme_programi");
 
@@ -478,11 +489,6 @@ namespace WebProje.Migrations
                     b.Navigation("basvurulan_hayvan");
                 });
 
-            modelBuilder.Entity("WebProje.Entity.AsiTakvimi", b =>
-                {
-                    b.Navigation("hayvan");
-                });
-
             modelBuilder.Entity("WebProje.Entity.BarinakBilgileri", b =>
                 {
                     b.Navigation("calisma_saatleri");
@@ -510,6 +516,8 @@ namespace WebProje.Migrations
 
             modelBuilder.Entity("WebProje.Entity.KayitliHayvanlar", b =>
                 {
+                    b.Navigation("asi_takvimi");
+
                     b.Navigation("fotograflari");
 
                     b.Navigation("sahiplenme_basvurulari");

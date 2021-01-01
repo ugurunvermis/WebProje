@@ -3,25 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WebProje.Migrations
 {
-    public partial class Create_Database : Migration
+    public partial class Create_Table : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "AsiTakvimi",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    asi_adi = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    asi_tarihi = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    asi_durumu = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AsiTakvimi", x => x.id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "BarinakBilgileri",
                 columns: table => new
@@ -212,7 +197,8 @@ namespace WebProje.Migrations
                 name: "KayitliHayvanlar",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     adi = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     yas = table.Column<int>(type: "int", nullable: false),
                     hakkinda = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -225,12 +211,6 @@ namespace WebProje.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_KayitliHayvanlar", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_KayitliHayvanlar_AsiTakvimi_id",
-                        column: x => x.id,
-                        principalTable: "AsiTakvimi",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_KayitliHayvanlar_BeslenmeProgrami_beslenme_programiid",
                         column: x => x.beslenme_programiid,
@@ -261,6 +241,28 @@ namespace WebProje.Migrations
                         principalTable: "SahiplenebilirlikDurumu",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AsiTakvimi",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    asi_adi = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    asi_tarihi = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    asi_durumu = table.Column<bool>(type: "bit", nullable: false),
+                    kayitli_hayvan_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AsiTakvimi", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_AsiTakvimi_KayitliHayvanlar_kayitli_hayvan_id",
+                        column: x => x.kayitli_hayvan_id,
+                        principalTable: "KayitliHayvanlar",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -315,6 +317,12 @@ namespace WebProje.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AsiTakvimi_kayitli_hayvan_id",
+                table: "AsiTakvimi",
+                column: "kayitli_hayvan_id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_CalismaSaatleri_barinakid",
@@ -380,6 +388,9 @@ namespace WebProje.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AsiTakvimi");
+
+            migrationBuilder.DropTable(
                 name: "CalismaSaatleri");
 
             migrationBuilder.DropTable(
@@ -399,9 +410,6 @@ namespace WebProje.Migrations
 
             migrationBuilder.DropTable(
                 name: "SahiplenmeBasvuruDurumlari");
-
-            migrationBuilder.DropTable(
-                name: "AsiTakvimi");
 
             migrationBuilder.DropTable(
                 name: "BeslenmeProgrami");

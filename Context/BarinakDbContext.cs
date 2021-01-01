@@ -27,9 +27,13 @@ namespace WebProje.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AsiTakvimi>().HasOne(a => a.hayvan).WithOne(h => h.asi_takvimi).HasForeignKey<KayitliHayvanlar>(h=>h.id);
+            modelBuilder.Entity<KayitliHayvanlar>()
+                .HasOne(h => h.asi_takvimi)
+                .WithOne(h => h.hayvan)
+                .HasForeignKey<AsiTakvimi>(a => a.kayitli_hayvan_id);
 
             base.OnModelCreating(modelBuilder);
         }
+
     }
 }
